@@ -11,9 +11,13 @@
       <v-card-text>
         <v-list class="transparent">
           <v-list-item v-for="(u,name) in user" :key="u.email">
-            <v-list-item-title>{{ name | capitalize}} : {{u | capitalize}}</v-list-item-title>
+            <v-list-item-title><b>{{ name | capitalize}}</b> : {{u | capitalize}}</v-list-item-title>
           </v-list-item>
         </v-list>
+        <v-divider></v-divider>
+           <div class="d-flex">
+          <v-btn text color="primary" @click.native="logOut()">Logout</v-btn>
+          </div>
       </v-card-text>
       <!-- <md-card-title>
         <div class="md-title">{{user.name}}</div>
@@ -45,6 +49,7 @@
                   <th>Actions</th>
                 </tr>
               </thead>
+              <!-- {{userList}} -->
               <tbody>
                 <tr v-for="(user,index) in userList" :key="user.name">
                   <td>{{user.name || 'NA'}}</td>
@@ -76,7 +81,7 @@
                               v-if="editUser"
                               :userDetails="editingUser"
                               :userIndex="userIndex"
-                              title
+                              :_id="user._id"
                               @cancelled="cancel(index)"
                               @submitted="saved(index)"
                             />
@@ -110,7 +115,7 @@ export default {
   // http://dummy.restapiexample.com/api/v1/employees
   async asyncData({ app }) {
     const self = this;
-    const res = await axios.get("http://127.0.0.1:5000/api/users");
+    const res = await axios.get("https://nuxt-server.herokuapp.com/api/users");
     app.store.dispatch("setAllUsers", res.data);
     let userList = app.store.getters.getUsers;
     let dialog=[];
@@ -228,5 +233,9 @@ margin:40px 0px;
 .d-flex{
   display: flex;
   justify-content: flex-end;
+}
+.fa{
+  cursor:pointer;
+  margin-left:10px
 }
 </style>

@@ -3,7 +3,7 @@
   <div>
     <h1>{{title}}</h1>
     <v-card-text>
-      <form @submit.prevent="registration">
+      <v-form ref="form" @submit.prevent="registration">
         <v-text-field label="Name" v-model="user.name.value" :rules="user.name"></v-text-field>
         <v-text-field label="Email" v-model="user.email.value" :rules="user.email"></v-text-field>
         <v-text-field label="Password" v-model="user.password.value" :rules="user.password"></v-text-field>
@@ -17,8 +17,21 @@
           :rules="user.address.country"
         ></v-text-field>-->
         <div class="c-flex">
-          <v-btn type="submit" v-if="editting" small elevation="2" color="primary">Save</v-btn>
-          <v-btn type="submit" v-if="!editting" small elevation="2" color="primary">Register</v-btn>
+          <v-btn
+            type="submit"
+            v-if="editting"
+            small
+            elevation="2"
+            color="primary"
+            :disabled="!valid"
+          >Save</v-btn>
+          <v-btn
+            type="submit"
+            v-if="!editting"
+            small
+            elevation="2"
+            color="primary"
+          >Register</v-btn>
           <v-btn
             type="button"
             v-if="editting"
@@ -28,7 +41,7 @@
             @click.native="cancelClick()"
           >Cancel</v-btn>
         </div>
-      </form>
+      </v-form>
     </v-card-text>
     <!-- {{user}} -->
   </div>
@@ -38,11 +51,14 @@ export default {
   props: {
     title: "",
     userDetails: {},
-    userIndex: ""
+    userIndex: "",
+    _id: ""
   },
   name: "Registration",
   data: function() {
     return {
+      valid: true,
+      lazy:true,
       user: {
         name: [value => !!value || "Required."],
         email: [
@@ -70,6 +86,7 @@ export default {
     if (this.userDetails && Object.keys(this.userDetails).length > 0) {
       this.editting = true;
       this.btnName = "Save";
+      // console.log(this.userDetails)
       (this.user.name.value = this.userDetails.name),
         (this.user.email.value = this.userDetails.email),
         (this.user.password.value = this.userDetails.password),
@@ -127,12 +144,38 @@ export default {
     console.log("Before Update");
   },
   methods: {
+    validate() {
+      if (this.$refs.form.validate()) {
+        this.snackbar = true;
+      }else{
+        alert("please Fill All Required Fields")
+      }
+    },
     registration: function() {
-      console.log("userIndex", this.userIndex);
-      console.log("user", this.user);
-      if (!this.editting) {
-        this.$store
-          .dispatch("addUser", {
+      if (this.$refs.form.validate()) {
+        if (!this.editting) {
+          this.$store
+            .dispatch("addUser", {
+              name: this.user.name.value,
+              email: this.user.email.value,
+              password: this.user.password.value,
+              company: this.user.company.value,
+              jobtitle: this.user.jobtitle.value,
+              address: this.user.address.value
+              // address: {
+              //   city: this.user.address.city.value,
+              //   state: this.user.address.state.value,
+              //   country: this.user.address.country.value
+              // }
+            })
+            .then(res => {
+              if (res) {
+                alert("Registered");
+                this.$emit("submitted", true);
+              }
+            });
+        } else {
+          const temp = {
             name: this.user.name.value,
             email: this.user.email.value,
             password: this.user.password.value,
@@ -144,34 +187,22 @@ export default {
             //   state: this.user.address.state.value,
             //   country: this.user.address.country.value
             // }
-          })
-          .then(res => {
-            if (res) {
-              alert("Registered");
-            }
-          });
-      } else {
-        const temp = {
-          name: this.user.name.value,
-          email: this.user.email.value,
-          password: this.user.password.value,
-          company: this.user.company.value,
-          jobtitle: this.user.jobtitle.value,
-          address: this.user.address.value
-          // address: {
-          //   city: this.user.address.city.value,
-          //   state: this.user.address.state.value,
-          //   country: this.user.address.country.value
-          // }
-        };
-        console.log(">>>>FinalData", temp);
-        this.$store.dispatch("editUser", {
-          temp: temp,
-          id: this.userDetails._id
-        });
+          };
+          console.log(">>>>Id", this._id);
+          this.$store
+            .dispatch("editUser", {
+              temp: temp,
+              id: this._id
+            })
+            .then(res => {
+              console.log(this.$store.getters.getUsers);
+              this.$emit("submitted", true);
+            });
+        }
       }
-      console.log(this.$store.getters.getUsers);
-      this.$emit("submitted", true);
+      else{
+        alert("Please Fill All Required Fields")
+      }
     },
     cancelClick: function() {
       this.$emit("cancelled");

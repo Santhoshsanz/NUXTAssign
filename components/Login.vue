@@ -2,7 +2,7 @@
 <template>
   <div>
     <h1>Login</h1>
-    <form @submit.prevent="login">
+    <v-form ref="form" @submit.prevent="login">
       <v-card-text>
         <v-text-field label="Email" v-model="email.value" :rules="email" hide-details="auto"></v-text-field>
         <v-text-field
@@ -26,12 +26,12 @@
       </md-field>-->
       <v-card-actions>
         <div class="d-flex">
-        <v-btn type="submit" small color="primary">Login</v-btn>
+          <v-btn type="submit" small color="primary">Login</v-btn>
         </div>
       </v-card-actions>
       <!-- <md-button  class="md-raised" :disabled="$v.$invalid">Login</md-button> -->
       <!-- <a v-on:click="login">Submit</a> -->
-    </form>
+    </v-form>
     <!-- {{$v}} -->
   </div>
 </template>
@@ -42,6 +42,8 @@ export default {
   name: "Login",
   data: function() {
     return {
+      valid: true,
+      lazy: true,
       email: [
         value => !!value || "Required.",
         value => {
@@ -55,7 +57,8 @@ export default {
   methods: {
     login: function() {
       // console.log(this.$store.getters.getUser('admin'))
-      this.$store
+      if (this.$refs.form.validate()) {
+        this.$store
         .dispatch("login", {
           email: this.email,
           password: this.password
@@ -73,13 +76,18 @@ export default {
           console.log("Error");
           alert("Wrong Credentials");
         });
+      }
+      else{
+        alert('Please Fill All Details')
+      }
     }
   }
 };
 </script>
 
 <style>
-.v-card__actions{
+.v-card__actions {
   /* display: flex; */
   justify-content: center;
-}</style>
+}
+</style>

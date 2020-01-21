@@ -94,7 +94,7 @@ export const actions = {
                 commit('auth_success', cUser);
                 resolve(true)
             } else {
-                axios.get('http://127.0.0.1:5000/api/users')
+                axios.get('https://nuxt-server.herokuapp.com/api/users')
                     .then((res) => {
                         let users = res.data;
                         let len = res.data.length;
@@ -122,7 +122,7 @@ export const actions = {
         commit
     }, user) {
         return new Promise((resolve, reject) => {
-            axios.post('http://127.0.0.1:5000/api/register', user).then(res => {
+            axios.post('https://nuxt-server.herokuapp.com/api/register', user).then(res => {
                 resolve(true)
             })
         })
@@ -131,15 +131,15 @@ export const actions = {
         commit
     }, user) {
         return new Promise((resolve, reject) => {
-            debugger
-            axios.put('http://127.0.0.1:5000/api/user/' + user.id, user.temp).then(res => {
+            axios.put('https://nuxt-server.herokuapp.com/api/user/' + user.id, user.temp).then(res => {
                 commit('editUser', user.temp)
+                resolve(true)
             })
         })
     },
     deleteUser({ commit }, data) {
         return new Promise((resolve, reject) => {
-            axios.delete("http://127.0.0.1:5000/api/user/" + data.id).then(res => {
+            axios.delete("https://nuxt-server.herokuapp.com/api/user/" + data.id).then(res => {
                 commit('deleteUser', data.index)
                 resolve(true);
             }).catch(res => {

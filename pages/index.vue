@@ -47,6 +47,7 @@ export default {
       }
     },
     regSubmitted: function(val) {
+      debugger
       if (val) {
         this.login = !this.login;
       }
